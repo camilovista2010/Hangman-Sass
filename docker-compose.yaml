@@ -24,7 +24,7 @@ services:
       - traefik.http.services.go-contact-svc.loadbalancer.servers.0.url=https://goomnicanal.gocontact.es/
 
     networks:
-      - traefik
+      - coolify
 
 # Middlewares por file provider (redir y gzip) — en dinámico (file)
 # Entra en un archivo p.e. dynamic.yml montado a Traefik:
