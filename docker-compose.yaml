@@ -1,0 +1,41 @@
+services:
+  go-contact-proxy:
+    image: traefik/whoami:latest   # contenedor dummy, no se usará como upstream real
+    labels:
+      - traefik.enable=true
+
+      # Router HTTP -> redirige a HTTPS
+      - traefik.http.routers.go-contact-web.entrypoints=http
+      - traefik.http.routers.go-contact-web.rule=Host(`go-contact.venturaextranjeria.com`)
+      - traefik.http.routers.go-contact-web.middlewares=redirect-to-https@file
+
+      # Router HTTPS
+      - traefik.http.routers.go-contact-secure.entrypoints=https
+      - traefik.http.routers.go-contact-secure.rule=Host(`go-contact.venturaextranjeria.com`)
+      - traefik.http.routers.go-contact-secure.tls=true
+      - traefik.http.routers.go-contact-secure.tls.certresolver=letsencrypt
+      - traefik.http.routers.go-contact-secure.middlewares=gzip@file
+      - traefik.http.routers.go-contact-secure.service=go-contact-svc
+
+      # Service apuntando a un upstream EXTERNO
+      - traefik.http.services.go-contact-svc.loadbalancer.server.scheme=https
+      - traefik.http.services.go-contact-svc.loadbalancer.server.port=443
+      - traefik.http.services.go-contact-svc.loadbalancer.serversTransport=skipverify
+      - traefik.http.services.go-contact-svc.loadbalancer.servers.0.url=https://goomnicanal.gocontact.es/
+
+    networks:
+      - traefik
+
+# Middlewares por file provider (redir y gzip) — en dinámico (file)
+# Entra en un archivo p.e. dynamic.yml montado a Traefik:
+#   http:
+#     middlewares:
+#       redirect-to-https:
+#         redirectScheme:
+#           scheme: https
+#       gzip:
+#         compress: {}
+
+networks:
+  traefik:
+    external: true
