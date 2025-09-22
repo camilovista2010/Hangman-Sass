@@ -26,16 +26,6 @@ services:
     networks:
       - coolify
 
-# Middlewares por file provider (redir y gzip) — en dinámico (file)
-# Entra en un archivo p.e. dynamic.yml montado a Traefik:
-#   http:
-#     middlewares:
-#       redirect-to-https:
-#         redirectScheme:
-#           scheme: https
-#       gzip:
-#         compress: {}
-
 networks:
-  traefik:
+  coolify:
     external: true
